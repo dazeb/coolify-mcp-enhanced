@@ -20,7 +20,33 @@ This is a significantly enhanced version of the [original Coolify MCP Server](ht
 - **Beginners** - Easy setup with clear examples
 - **AI Enthusiasts** - Natural language infrastructure control
 
+## 📋 Prerequisites
+
+Before installation, ensure you have:
+- **Node.js 18+** installed
+- **Git** installed
+- **Access to a Coolify server** (self-hosted, v0cl.one, or Coolify Cloud)
+- **Coolify API token** with appropriate permissions
+
 ## 🎬 Quick Start Guide
+
+### Option A: Interactive Setup (Recommended for Beginners)
+
+```bash
+# Clone and run the interactive setup guide
+git clone https://github.com/dazeb/coolify-mcp-enhanced.git
+cd coolify-mcp-enhanced
+npm install && npm run build
+node setup-guide.js
+```
+
+The interactive guide will walk you through:
+1. ✅ Getting your Coolify API token
+2. ✅ Configuring your server URL
+3. ✅ Setting up your AI assistant
+4. ✅ Testing the connection
+
+### Option B: Manual Setup
 
 ### Step 1: Get Your Coolify API Token
 
@@ -63,6 +89,23 @@ node test-mcpaas.js
 # You should see:
 # ✅ GitHub Repo: PASS
 # ✅ Basic connectivity working
+```
+
+### Step 5: Quick Verification
+
+```bash
+# Test MCP server directly
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_servers","arguments":{}}}' | node dist/index.js
+
+# Expected output: JSON response with your Coolify server information
+```
+
+## ⚡ One-Command Installation
+
+For AI agents or advanced users, here's the complete installation in one command:
+
+```bash
+git clone https://github.com/dazeb/coolify-mcp-enhanced.git && cd coolify-mcp-enhanced && npm install && npm run build && echo "✅ Installation complete! Run 'node setup-guide.js' for configuration."
 ```
 
 ## 🤖 AI Assistant Integration
