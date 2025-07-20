@@ -1,8 +1,8 @@
 {
-  "name": "@masonator/coolify-mcp",
-  "scope": "@masonator",
-  "version": "0.2.8",
-  "description": "MCP server implementation for Coolify",
+  "name": "@dazeb/coolify-mcp-enhanced",
+  "scope": "@dazeb",
+  "version": "1.0.0",
+  "description": "Enhanced MCP server implementation for Coolify with MCPaaS deployment capabilities",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,10 +36,23 @@
   "keywords": [
     "coolify",
     "mcp",
-    "model-context-protocol"
+    "model-context-protocol",
+    "mcpaas",
+    "deployment",
+    "automation",
+    "docker",
+    "infrastructure"
   ],
-  "author": "Stuart Mason",
+  "author": "Enhanced by dazeb, Original by Stuart Mason",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dazeb/coolify-mcp-enhanced.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dazeb/coolify-mcp-enhanced/issues"
+  },
+  "homepage": "https://github.com/dazeb/coolify-mcp-enhanced#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
     "reflect-metadata": "^0.2.2",

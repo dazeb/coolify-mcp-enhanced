@@ -1,223 +1,229 @@
-# Coolify MCP Server
+# 🚀 Enhanced Coolify MCP Server
 
-A Model Context Protocol (MCP) server implementation for [Coolify](https://coolify.io/), enabling AI assistants to interact with your Coolify instances through natural language.
+An enhanced Model Context Protocol (MCP) server implementation for [Coolify](https://coolify.io/) with **MCPaaS deployment capabilities**. This server enables AI assistants to deploy and manage complete **Model Context Protocol Platform as a Service** infrastructure through natural language.
 
-## Example Prompts
+## ✨ What's New in This Enhanced Version
 
-Here are example prompts you can use with MCP-compatible AI assistants to interact with your Coolify instance:
+This is a significantly enhanced version of the [original Coolify MCP Server](https://github.com/StuMason/coolify-mcp) with powerful new features for **automated MCPaaS deployment**:
 
-### Server Management
+### 🎯 **MCPaaS-Specific Features**
+- **One-click MCPaaS project creation** with `create_mcpaas_project`
+- **Automated infrastructure deployment** with `deploy_mcpaas_stack`
+- **Complete application lifecycle management**
+- **Automated deployment scripts** for zero-configuration setup
 
-```
-# List and Inspect Servers
-- Show me all Coolify servers in my instance
-- What's the status of server {uuid}?
-- Show me the resources running on server {uuid}
-- What domains are configured for server {uuid}?
-- Can you validate the connection to server {uuid}?
+### 🛠️ **Enhanced Application Management**
+- Create, list, get, delete applications with full configuration
+- Monitor application resource usage and performance
+- Real-time log streaming and analysis
+- Environment variable bulk management
+- Docker Compose service deployment
 
-# Resource Monitoring
-- How much CPU and memory is server {uuid} using?
-- List all resources running on server {uuid}
-- Show me the current status of all servers
-```
+### 📊 **Advanced Deployment Management**
+- List, monitor, and cancel deployments in real-time
+- Deployment status tracking and notifications
+- Automated rollback and recovery capabilities
 
-### Project Management
+## 🎬 Quick Start - Deploy MCPaaS in Minutes
 
-```
-# Project Operations
-- List all my Coolify projects
-- Create a new project called "my-webapp" with description "My web application"
-- Show me the details of project {uuid}
-- Update project {uuid} to change its name to "new-name"
-- Delete project {uuid}
+```bash
+# 1. Clone and setup
+git clone https://github.com/dazeb/coolify-mcp-enhanced.git
+cd coolify-mcp-enhanced
+npm install && npm run build
 
-# Environment Management
-- Show me the environments in project {uuid}
-- Get details of the production environment in project {uuid}
-- What variables are set in the staging environment of project {uuid}?
-```
+# 2. Configure your environment
+export COOLIFY_ACCESS_TOKEN="your-coolify-api-token"
+export COOLIFY_BASE_URL="https://your-coolify-instance.com"
+export MCPAAS_DOMAIN="mcpaas.yourdomain.com"
 
-### Application and Service Management
-
-```
-# Application Management
-- List all applications
-- Show me details of application {uuid}
-- Create a new application called "my-nodejs-app"
-- Delete application {uuid}
-
-# Service Operations
-- Show me all running services
-- Create a new WordPress service:
-  - Name: my-blog
-  - Project UUID: {project_uuid}
-  - Server UUID: {server_uuid}
-  - Type: wordpress-with-mysql
-- What's the status of service {uuid}?
-- Delete service {uuid} and clean up its resources
+# 3. Deploy MCPaaS automatically
+node deploy-mcpaas.js
 ```
 
-### Database Management
+**That's it!** Your complete MCPaaS platform will be deployed with:
+- ✅ PostgreSQL database
+- ✅ Redis cache  
+- ✅ MinIO object storage
+- ✅ MCPaaS frontend application
+- ✅ All networking and SSL configured
 
-```
-# Database Operations
-- List all databases
-- Show me the configuration of database {uuid}
-- Update database {uuid}:
-  - Increase memory limit to 1GB
-  - Change public port to 5432
-  - Update password
-- Delete database {uuid} and clean up volumes
-
-# Database Types
-- Create a PostgreSQL database
-- Set up a Redis instance
-- Configure a MongoDB database
-- Initialize a MySQL database
-```
-
-### Deployment Management
-
-```
-# Deployment Operations
-- Show me all active deployments
-- What's the status of deployment {uuid}?
-- Deploy application {uuid}
-- Force rebuild and deploy application {uuid}
-- List recent deployments for application {uuid}
-```
-
-## Installation
+## 🔧 Installation & Setup
 
 ### Prerequisites
-
 - Node.js >= 18
 - A running Coolify instance
 - Coolify API access token
 
-### Setup in AI Tools
+### Method 1: NPM Package (Coming Soon)
+```bash
+npm install -g @dazeb/coolify-mcp-enhanced
+```
 
-#### Claude Desktop
+### Method 2: From Source
+```bash
+git clone https://github.com/dazeb/coolify-mcp-enhanced.git
+cd coolify-mcp-enhanced
+npm install
+npm run build
+```
+
+### Method 3: Using uvx (Recommended)
+```bash
+uvx @dazeb/coolify-mcp-enhanced
+```
+
+## 🎯 New Tools & Capabilities
+
+### MCPaaS Deployment Tools
+| Tool | Description | Usage |
+|------|-------------|-------|
+| `create_mcpaas_project` | Create complete MCPaaS project | One-click project setup |
+| `deploy_mcpaas_stack` | Deploy infrastructure services | PostgreSQL + Redis + MinIO |
+
+### Application Management
+| Tool | Description | Usage |
+|------|-------------|-------|
+| `list_applications` | List all applications | Get overview of deployments |
+| `create_application` | Create new application | Deploy from Git repository |
+| `get_application_resources` | Monitor resource usage | Performance monitoring |
+| `get_application_logs` | Stream application logs | Real-time debugging |
+
+### Environment & Configuration
+| Tool | Description | Usage |
+|------|-------------|-------|
+| `get_application_environment_variables` | Get env vars | Configuration management |
+| `update_application_environment_variables` | Update env vars | Bulk configuration updates |
+| `create_docker_compose_service` | Deploy Docker Compose | Custom service deployment |
+
+### Deployment Management
+| Tool | Description | Usage |
+|------|-------------|-------|
+| `get_deployments` | List deployments | Track deployment history |
+| `cancel_deployment` | Cancel running deployment | Stop failed deployments |
+| `get_deployment` | Get deployment details | Monitor deployment status |
+
+## 🤖 AI Assistant Integration
+
+### Claude Desktop Configuration
+
+Add to your `claude_desktop_config.json`:
 
 ```json
-"coolify": {
-    "command": "npx",
-    "args": [
-        "-y", "@masonator/coolify-mcp"
-    ],
-    "env": {
-        "COOLIFY_ACCESS_TOKEN": "0|your-secret-token",
+{
+  "mcpServers": {
+    "coolify-enhanced": {
+      "command": "node",
+      "args": ["/path/to/coolify-mcp-enhanced/dist/index.js"],
+      "env": {
+        "COOLIFY_ACCESS_TOKEN": "your-token",
         "COOLIFY_BASE_URL": "https://your-coolify-instance.com"
+      }
     }
+  }
 }
 ```
 
-#### Cursor
+### Example AI Prompts
 
-```bash
-env COOLIFY_ACCESS_TOKEN:0|your-secret-token COOLIFY_BASE_URL:https://your-coolify-instance.com npx -y @stumason/coolify-mcp
+```
+# Deploy complete MCPaaS platform
+"Create a new MCPaaS project called 'my-platform' and deploy the full stack including PostgreSQL, Redis, and MinIO services on my Coolify server."
+
+# Monitor applications
+"Show me all applications and their resource usage. If any application is using more than 80% CPU, show me its logs."
+
+# Manage deployments
+"List all deployments for my MCPaaS frontend application and cancel any that are stuck or failed."
+
+# Environment management
+"Update the environment variables for my MCPaaS application to include the GitHub OAuth credentials and restart the application."
 ```
 
-## Development
+## 📚 Comprehensive Documentation
 
-### Local Setup
+- **[MCPaaS Deployment Guide](README-MCPAAS.md)** - Complete deployment documentation
+- **[API Reference](docs/api-reference.md)** - All available tools and parameters
+- **[Examples](examples/)** - Real-world usage examples
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
+## 🧪 Testing & Validation
+
+### Test the Enhanced Server
 ```bash
-# Clone the repository
-git clone https://github.com/stumason/coolify-mcp.git
-cd coolify-mcp
+# Test basic functionality
+node test-mcpaas.js
 
-# Install dependencies
-npm install
+# Test MCPaaS deployment (dry run)
+MCPAAS_DOMAIN=test.example.com node deploy-mcpaas.js --dry-run
 
-# Build the project
-npm run build
-
-# Run tests
+# Run full test suite
 npm test
 ```
 
-### Environment Variables
-
+### Validate Your Deployment
 ```bash
-# Required
-COOLIFY_ACCESS_TOKEN=your_access_token_here
+# Check all services are running
+curl https://your-mcpaas-domain.com/api/health
 
-# Optional (defaults to http://localhost:3000)
-COOLIFY_BASE_URL=https://your.coolify.instance
+# Test MCP server functionality
+curl https://your-mcpaas-domain.com/api/mcp/health
 ```
 
-## API Reference
+## 🌟 What Makes This Enhanced?
 
-### Resource Types
+| Feature | Original Server | Enhanced Server |
+|---------|----------------|-----------------|
+| **Basic Operations** | ✅ Servers, Projects, Services | ✅ All original features |
+| **Application Management** | ❌ Limited | ✅ Complete lifecycle |
+| **MCPaaS Deployment** | ❌ Manual setup | ✅ One-click automation |
+| **Environment Variables** | ❌ Not supported | ✅ Bulk management |
+| **Deployment Monitoring** | ❌ Basic status | ✅ Real-time tracking |
+| **Docker Compose** | ❌ Not supported | ✅ Full support |
+| **Automated Scripts** | ❌ None | ✅ Complete automation |
+| **Resource Monitoring** | ❌ Limited | ✅ Comprehensive metrics |
 
-#### Application
+## 🚀 Real-World Use Cases
 
-```typescript
-interface Application {
-  uuid: string;
-  name: string;
-  // Additional properties based on your Coolify instance
-}
-```
+### 1. **Instant MCPaaS Deployment**
+Deploy a complete Model Context Protocol platform in under 5 minutes with full infrastructure, monitoring, and SSL.
 
-#### Service
+### 2. **AI-Powered DevOps**
+Use AI assistants to manage your entire Coolify infrastructure through natural language commands.
 
-```typescript
-interface Service {
-  id: number;
-  uuid: string;
-  name: string;
-  type: ServiceType; // Various types like 'wordpress', 'mysql', etc.
-  status: 'running' | 'stopped' | 'error';
-  project_uuid: string;
-  environment_uuid: string;
-  server_uuid: string;
-  domains?: string[];
-}
-```
+### 3. **Automated CI/CD**
+Integrate with your CI/CD pipelines for automated application deployment and management.
 
-#### Database
+### 4. **Multi-Environment Management**
+Manage development, staging, and production environments with consistent automation.
 
-```typescript
-interface Database {
-  id: number;
-  uuid: string;
-  name: string;
-  type: 'postgresql' | 'mysql' | 'mongodb' | 'redis' | /* other types */;
-  status: 'running' | 'stopped' | 'error';
-  is_public: boolean;
-  public_port?: number;
-  // Additional configuration based on database type
-}
-```
+## 🤝 Contributing
 
-#### Deployment
+We welcome contributions! This enhanced server builds upon the excellent foundation of the original Coolify MCP Server.
 
-```typescript
-interface Deployment {
-  id: number;
-  uuid: string;
-  application_uuid: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
-```
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Submit a pull request
 
-## Contributing
+## 📄 License
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+MIT License - Enhanced version maintains the same license as the original.
 
-## License
+## 🙏 Acknowledgments
 
-MIT
+- **[Stuart Mason](https://github.com/StuMason)** - Original Coolify MCP Server
+- **[Coolify](https://coolify.io/)** - Amazing self-hosting platform
+- **[Model Context Protocol](https://modelcontextprotocol.io/)** - Revolutionary AI integration standard
 
-## Support
+## 🔗 Links
 
-For support, please:
+- **[Original Coolify MCP Server](https://github.com/StuMason/coolify-mcp)**
+- **[MCPaaS Platform](https://github.com/dazeb/mcpaas-v3)**
+- **[Coolify Documentation](https://coolify.io/docs)**
+- **[MCP Specification](https://spec.modelcontextprotocol.io/)**
 
-1. Check the [issues](https://github.com/stumason/coolify-mcp/issues) page
-2. Create a new issue if needed
-3. Join the Coolify community
+---
+
+**Ready to revolutionize your deployment workflow?** 
+🚀 **[Get started with MCPaaS deployment now!](README-MCPAAS.md)**
