@@ -329,6 +329,181 @@ export class CoolifyMcpServer extends McpServer {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
       };
     });
+
+    // Application Management Tools
+    this.tool('list_applications', 'List all Coolify applications', {}, async (_args, _extra) => {
+      const applications = await this.client.listApplications();
+      return {
+        content: [{ type: 'text', text: JSON.stringify(applications, null, 2) }]
+      };
+    });
+
+    this.tool('get_application', 'Get details about a specific Coolify application', {
+      uuid: z.string()
+    }, async (args, _extra) => {
+      const application = await this.client.getApplication(args.uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(application, null, 2) }]
+      };
+    });
+
+    this.tool('create_application', 'Create a new Coolify application', {
+      name: z.string(),
+      description: z.string().optional(),
+      project_uuid: z.string(),
+      server_uuid: z.string(),
+      git_repository: z.string().optional(),
+      git_branch: z.string().optional(),
+      build_pack: z.enum(['nixpacks', 'dockerfile', 'docker-compose', 'static']).optional(),
+      dockerfile_location: z.string().optional(),
+      docker_compose_location: z.string().optional(),
+      fqdn: z.string().optional(),
+      environment_name: z.string().optional()
+    }, async (args, _extra) => {
+      const result = await this.client.createApplication(args);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    this.tool('delete_application', 'Delete a Coolify application', {
+      uuid: z.string(),
+      options: z.object(deleteOptionsSchema).optional()
+    }, async (args, _extra) => {
+      const result = await this.client.deleteApplication(args.uuid, args.options);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    // Environment Variable Management
+    this.tool('get_application_environment_variables', 'Get environment variables for an application', {
+      uuid: z.string()
+    }, async (args, _extra) => {
+      const variables = await this.client.getApplicationEnvironmentVariables(args.uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(variables, null, 2) }]
+      };
+    });
+
+    this.tool('update_application_environment_variables', 'Update environment variables for an application', {
+      uuid: z.string(),
+      variables: z.array(z.object({
+        key: z.string(),
+        value: z.string(),
+        is_preview: z.boolean().optional(),
+        is_build_time: z.boolean().optional(),
+        is_literal: z.boolean().optional()
+      }))
+    }, async (args, _extra) => {
+      const result = await this.client.updateApplicationEnvironmentVariables(args.uuid, args.variables);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    // Docker Compose Service Management
+    this.tool('create_docker_compose_service', 'Create a new Docker Compose service', {
+      name: z.string(),
+      description: z.string().optional(),
+      project_uuid: z.string(),
+      server_uuid: z.string(),
+      docker_compose_raw: z.string(),
+      git_repository: z.string().optional(),
+      git_branch: z.string().optional(),
+      instant_deploy: z.boolean().optional()
+    }, async (args, _extra) => {
+      const result = await this.client.createDockerComposeService(args);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    // Deployment Management
+    this.tool('get_deployments', 'Get deployments for an application', {
+      application_uuid: z.string()
+    }, async (args, _extra) => {
+      const deployments = await this.client.getDeployments(args.application_uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(deployments, null, 2) }]
+      };
+    });
+
+    this.tool('get_deployment', 'Get details about a specific deployment', {
+      uuid: z.string()
+    }, async (args, _extra) => {
+      const deployment = await this.client.getDeployment(args.uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(deployment, null, 2) }]
+      };
+    });
+
+    this.tool('cancel_deployment', 'Cancel a running deployment', {
+      uuid: z.string()
+    }, async (args, _extra) => {
+      const result = await this.client.cancelDeployment(args.uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    // Application Resources and Logs
+    this.tool('get_application_resources', 'Get resource usage for an application', {
+      uuid: z.string()
+    }, async (args, _extra) => {
+      const resources = await this.client.getApplicationResources(args.uuid);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(resources, null, 2) }]
+      };
+    });
+
+    this.tool('get_application_logs', 'Get logs for an application', {
+      uuid: z.string(),
+      since: z.string().optional(),
+      until: z.string().optional(),
+      lines: z.number().optional()
+    }, async (args, _extra) => {
+      const { uuid, ...options } = args;
+      const logs = await this.client.getApplicationLogs(uuid, options);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(logs, null, 2) }]
+      };
+    });
+
+    // MCPaaS Specific Tools
+    this.tool('create_mcpaas_project', 'Create a new MCPaaS project with all required services', {
+      name: z.string(),
+      description: z.string().optional(),
+      domain: z.string().optional(),
+      server_uuid: z.string()
+    }, async (args, _extra) => {
+      const result = await this.client.createMCPaaSProject(args);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
+
+    this.tool('deploy_mcpaas_stack', 'Deploy the complete MCPaaS stack (PostgreSQL, Redis, MinIO)', {
+      project_uuid: z.string(),
+      server_uuid: z.string(),
+      include_postgres: z.boolean().default(true),
+      include_redis: z.boolean().default(true),
+      include_minio: z.boolean().default(true),
+      domain: z.string().optional(),
+      environment_variables: z.record(z.string()).optional()
+    }, async (args, _extra) => {
+      const config = {
+        includePostgres: args.include_postgres,
+        includeRedis: args.include_redis,
+        includeMinIO: args.include_minio,
+        domain: args.domain,
+        environment_variables: args.environment_variables
+      };
+      const result = await this.client.deployMCPaaSStack(args.project_uuid, args.server_uuid, config);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    });
   }
 
   async connect(transport: Transport): Promise<void> {

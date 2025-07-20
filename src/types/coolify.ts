@@ -288,6 +288,14 @@ export type ServiceType =
   | 'phpmyadmin'
   | 'pocketbase'
   | 'posthog'
+  | 'postgresql'
+  | 'mysql'
+  | 'mariadb'
+  | 'mongodb'
+  | 'redis'
+  | 'keydb'
+  | 'clickhouse'
+  | 'dragonfly'
   | 'reactive-resume'
   | 'rocketchat'
   | 'shlink'
@@ -350,12 +358,152 @@ export interface DeleteServiceOptions {
 }
 
 export interface Application {
+  id: number;
   uuid: string;
   name: string;
-  // Add other application properties as needed
+  description?: string;
+  fqdn?: string;
+  git_repository?: string;
+  git_branch?: string;
+  build_pack?: string;
+  dockerfile_location?: string;
+  docker_compose_location?: string;
+  status: 'running' | 'stopped' | 'building' | 'error' | 'exited';
+  project_uuid: string;
+  environment_name: string;
+  environment_uuid: string;
+  server_uuid: string;
+  destination_uuid?: string;
+  created_at: string;
+  updated_at: string;
+  domains?: string[];
+  ports?: string;
+  preview_url_template?: string;
+  is_static?: boolean;
+  install_command?: string;
+  build_command?: string;
+  start_command?: string;
+  base_directory?: string;
+  publish_directory?: string;
 }
 
 export interface CreateApplicationRequest {
   name: string;
-  // Add other required fields for application creation
+  description?: string;
+  project_uuid: string;
+  environment_name?: string;
+  environment_uuid?: string;
+  server_uuid: string;
+  destination_uuid?: string;
+  git_repository?: string;
+  git_branch?: string;
+  build_pack?: 'nixpacks' | 'dockerfile' | 'docker-compose' | 'static';
+  dockerfile_location?: string;
+  docker_compose_location?: string;
+  install_command?: string;
+  build_command?: string;
+  start_command?: string;
+  base_directory?: string;
+  publish_directory?: string;
+  fqdn?: string;
+  ports?: string;
+  is_static?: boolean;
+  preview_url_template?: string;
+}
+
+export interface EnvironmentVariable {
+  id: number;
+  key: string;
+  value: string;
+  is_preview: boolean;
+  is_build_time: boolean;
+  is_literal: boolean;
+  is_multiline: boolean;
+  is_shown_once: boolean;
+  real_value?: string;
+  application_id?: number;
+  service_id?: number;
+  database_id?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EnvironmentVariableUpdate {
+  key: string;
+  value: string;
+  is_preview?: boolean;
+  is_build_time?: boolean;
+  is_literal?: boolean;
+  is_multiline?: boolean;
+  is_shown_once?: boolean;
+}
+
+export interface CreateDockerComposeServiceRequest {
+  name: string;
+  description?: string;
+  project_uuid: string;
+  environment_name?: string;
+  environment_uuid?: string;
+  server_uuid: string;
+  destination_uuid?: string;
+  docker_compose_raw: string;
+  docker_compose_location?: string;
+  git_repository?: string;
+  git_branch?: string;
+  instant_deploy?: boolean;
+}
+
+export interface UpdateDockerComposeServiceRequest {
+  name?: string;
+  description?: string;
+  docker_compose_raw?: string;
+  docker_compose_location?: string;
+  git_repository?: string;
+  git_branch?: string;
+}
+
+export interface ApplicationResources {
+  cpu_usage: number;
+  memory_usage: number;
+  memory_limit: number;
+  disk_usage: number;
+  network_rx: number;
+  network_tx: number;
+  uptime: number;
+}
+
+export interface LogOptions {
+  since?: string;
+  until?: string;
+  lines?: number;
+}
+
+export interface CreateMCPaaSProjectRequest {
+  name: string;
+  description?: string;
+  domain?: string;
+  server_uuid: string;
+}
+
+export interface MCPaaSProjectResponse {
+  project_uuid: string;
+  name: string;
+  description?: string;
+  services: string[];
+  status: 'created' | 'deploying' | 'deployed' | 'failed';
+}
+
+export interface MCPaaSDeploymentConfig {
+  includePostgres: boolean;
+  includeRedis: boolean;
+  includeMinIO: boolean;
+  domain?: string;
+  environment_variables?: Record<string, string>;
+}
+
+export interface MCPaaSDeploymentResponse {
+  project_uuid: string;
+  services: string[];
+  status: 'deployed' | 'failed' | 'partial';
+  message: string;
 }

@@ -15,6 +15,19 @@ import {
   Service,
   CreateServiceRequest,
   DeleteServiceOptions,
+  Application,
+  CreateApplicationRequest,
+  EnvironmentVariable,
+  EnvironmentVariableUpdate,
+  CreateDockerComposeServiceRequest,
+  UpdateDockerComposeServiceRequest,
+  ApplicationResources,
+  LogOptions,
+  LogEntry,
+  CreateMCPaaSProjectRequest,
+  MCPaaSProjectResponse,
+  MCPaaSDeploymentConfig,
+  MCPaaSDeploymentResponse,
 } from '../types/coolify.js';
 
 export class CoolifyClient {
@@ -221,5 +234,193 @@ export class CoolifyClient {
     });
   }
 
-  // Add more methods as needed for other endpoints
+  // Application Management Methods
+  async listApplications(): Promise<Application[]> {
+    return this.request<Application[]>('/applications');
+  }
+
+  async getApplication(uuid: string): Promise<Application> {
+    return this.request<Application>(`/applications/${uuid}`);
+  }
+
+  async createApplication(data: CreateApplicationRequest): Promise<{ uuid: string }> {
+    return this.request<{ uuid: string }>('/applications', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateApplication(uuid: string, data: Partial<Application>): Promise<Application> {
+    return this.request<Application>(`/applications/${uuid}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteApplication(uuid: string, options?: DeleteServiceOptions): Promise<{ message: string }> {
+    const queryParams = new URLSearchParams();
+    if (options) {
+      if (options.deleteConfigurations !== undefined) {
+        queryParams.set('delete_configurations', options.deleteConfigurations.toString());
+      }
+      if (options.deleteVolumes !== undefined) {
+        queryParams.set('delete_volumes', options.deleteVolumes.toString());
+      }
+      if (options.dockerCleanup !== undefined) {
+        queryParams.set('docker_cleanup', options.dockerCleanup.toString());
+      }
+      if (options.deleteConnectedNetworks !== undefined) {
+        queryParams.set('delete_connected_networks', options.deleteConnectedNetworks.toString());
+      }
+    }
+
+    const queryString = queryParams.toString();
+    const url = queryString ? `/applications/${uuid}?${queryString}` : `/applications/${uuid}`;
+
+    return this.request<{ message: string }>(url, {
+      method: 'DELETE',
+    });
+  }
+
+  // Environment Variable Management
+  async getApplicationEnvironmentVariables(uuid: string): Promise<EnvironmentVariable[]> {
+    return this.request<EnvironmentVariable[]>(`/applications/${uuid}/envs`);
+  }
+
+  async updateApplicationEnvironmentVariables(
+    uuid: string, 
+    variables: EnvironmentVariableUpdate[]
+  ): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/applications/${uuid}/envs`, {
+      method: 'POST',
+      body: JSON.stringify(variables),
+    });
+  }
+
+  // Docker Compose Service Management
+  async createDockerComposeService(data: CreateDockerComposeServiceRequest): Promise<{ uuid: string }> {
+    return this.request<{ uuid: string }>('/services/docker-compose', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateDockerComposeService(
+    uuid: string, 
+    data: UpdateDockerComposeServiceRequest
+  ): Promise<Service> {
+    return this.request<Service>(`/services/${uuid}/docker-compose`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Deployment Management
+  async getDeployments(applicationUuid: string): Promise<Deployment[]> {
+    return this.request<Deployment[]>(`/applications/${applicationUuid}/deployments`);
+  }
+
+  async getDeployment(uuid: string): Promise<Deployment> {
+    return this.request<Deployment>(`/deployments/${uuid}`);
+  }
+
+  async cancelDeployment(uuid: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/deployments/${uuid}/cancel`, {
+      method: 'POST',
+    });
+  }
+
+  // Resource Management
+  async getApplicationResources(uuid: string): Promise<ApplicationResources> {
+    return this.request<ApplicationResources>(`/applications/${uuid}/resources`);
+  }
+
+  async getApplicationLogs(uuid: string, options?: LogOptions): Promise<LogEntry[]> {
+    const queryParams = new URLSearchParams();
+    if (options?.since) queryParams.set('since', options.since);
+    if (options?.until) queryParams.set('until', options.until);
+    if (options?.lines) queryParams.set('lines', options.lines.toString());
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `/applications/${uuid}/logs?${queryString}` : `/applications/${uuid}/logs`;
+    
+    return this.request<LogEntry[]>(url);
+  }
+
+  // MCPaaS Specific Methods
+  async createMCPaaSProject(data: CreateMCPaaSProjectRequest): Promise<MCPaaSProjectResponse> {
+    // Create project first
+    const project = await this.createProject({
+      name: data.name,
+      description: data.description || 'MCPaaS Platform Deployment'
+    });
+
+    return {
+      project_uuid: project.uuid,
+      name: data.name,
+      description: data.description,
+      services: [],
+      status: 'created'
+    };
+  }
+
+  async deployMCPaaSStack(
+    projectUuid: string, 
+    serverUuid: string, 
+    config: MCPaaSDeploymentConfig
+  ): Promise<MCPaaSDeploymentResponse> {
+    const services: string[] = [];
+
+    try {
+      // Deploy PostgreSQL
+      if (config.includePostgres) {
+        const postgres = await this.createService({
+          type: 'postgresql',
+          project_uuid: projectUuid,
+          server_uuid: serverUuid,
+          name: 'mcpaas-postgres',
+          description: 'MCPaaS PostgreSQL Database'
+        });
+        services.push(postgres.uuid);
+      }
+
+      // Deploy Redis
+      if (config.includeRedis) {
+        const redis = await this.createService({
+          type: 'redis',
+          project_uuid: projectUuid,
+          server_uuid: serverUuid,
+          name: 'mcpaas-redis',
+          description: 'MCPaaS Redis Cache'
+        });
+        services.push(redis.uuid);
+      }
+
+      // Deploy MinIO
+      if (config.includeMinIO) {
+        const minio = await this.createService({
+          type: 'minio',
+          project_uuid: projectUuid,
+          server_uuid: serverUuid,
+          name: 'mcpaas-minio',
+          description: 'MCPaaS Object Storage'
+        });
+        services.push(minio.uuid);
+      }
+
+      return {
+        project_uuid: projectUuid,
+        services,
+        status: 'deployed',
+        message: 'MCPaaS stack deployed successfully'
+      };
+    } catch (error) {
+      return {
+        project_uuid: projectUuid,
+        services,
+        status: 'failed',
+        message: `Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
 }
