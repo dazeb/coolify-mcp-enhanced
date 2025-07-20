@@ -3,9 +3,10 @@
 // Interactive Setup Guide for Enhanced Coolify MCP Server
 // Helps beginners get started with clear instructions and examples
 
-const readline = require('readline');
-const fs = require('fs');
-const path = require('path');
+import readline from 'readline';
+import fs from 'fs';
+import path from 'path';
+import { spawn } from 'child_process';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -256,8 +257,6 @@ COOLIFY_BASE_URL="${coolifyUrl}"
     console.log('🔄 Testing connection to Coolify server...');
     
     try {
-      const { spawn } = require('child_process');
-      
       const testProcess = spawn('node', ['test-mcpaas.js'], {
         stdio: 'inherit',
         env: {
