@@ -478,14 +478,14 @@ export interface LogOptions {
   lines?: number;
 }
 
-export interface CreateMCPaaSProjectRequest {
+export interface CreateFullStackProjectRequest {
   name: string;
   description?: string;
   domain?: string;
   server_uuid: string;
 }
 
-export interface MCPaaSProjectResponse {
+export interface FullStackProjectResponse {
   project_uuid: string;
   name: string;
   description?: string;
@@ -493,7 +493,7 @@ export interface MCPaaSProjectResponse {
   status: 'created' | 'deploying' | 'deployed' | 'failed';
 }
 
-export interface MCPaaSDeploymentConfig {
+export interface InfrastructureDeploymentConfig {
   includePostgres: boolean;
   includeRedis: boolean;
   includeMinIO: boolean;
@@ -501,7 +501,7 @@ export interface MCPaaSDeploymentConfig {
   environment_variables?: Record<string, string>;
 }
 
-export interface MCPaaSDeploymentResponse {
+export interface InfrastructureDeploymentResponse {
   project_uuid: string;
   services: string[];
   status: 'deployed' | 'failed' | 'partial';

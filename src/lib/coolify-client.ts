@@ -24,10 +24,10 @@ import {
   ApplicationResources,
   LogOptions,
   LogEntry,
-  CreateMCPaaSProjectRequest,
-  MCPaaSProjectResponse,
-  MCPaaSDeploymentConfig,
-  MCPaaSDeploymentResponse,
+  CreateFullStackProjectRequest,
+  FullStackProjectResponse,
+  InfrastructureDeploymentConfig,
+  InfrastructureDeploymentResponse,
 } from '../types/coolify.js';
 
 export class CoolifyClient {
@@ -347,12 +347,12 @@ export class CoolifyClient {
     return this.request<LogEntry[]>(url);
   }
 
-  // MCPaaS Specific Methods
-  async createMCPaaSProject(data: CreateMCPaaSProjectRequest): Promise<MCPaaSProjectResponse> {
+  // Full-Stack Project Methods
+  async createFullStackProject(data: CreateFullStackProjectRequest): Promise<FullStackProjectResponse> {
     // Create project first
     const project = await this.createProject({
       name: data.name,
-      description: data.description || 'MCPaaS Platform Deployment'
+      description: data.description || 'Full-Stack Application Deployment'
     });
 
     return {
@@ -364,11 +364,11 @@ export class CoolifyClient {
     };
   }
 
-  async deployMCPaaSStack(
+  async deployInfrastructureStack(
     projectUuid: string, 
     serverUuid: string, 
-    config: MCPaaSDeploymentConfig
-  ): Promise<MCPaaSDeploymentResponse> {
+    config: InfrastructureDeploymentConfig
+  ): Promise<InfrastructureDeploymentResponse> {
     const services: string[] = [];
 
     try {
@@ -378,8 +378,8 @@ export class CoolifyClient {
           type: 'postgresql',
           project_uuid: projectUuid,
           server_uuid: serverUuid,
-          name: 'mcpaas-postgres',
-          description: 'MCPaaS PostgreSQL Database'
+          name: 'app-postgres',
+          description: 'PostgreSQL Database'
         });
         services.push(postgres.uuid);
       }
@@ -390,8 +390,8 @@ export class CoolifyClient {
           type: 'redis',
           project_uuid: projectUuid,
           server_uuid: serverUuid,
-          name: 'mcpaas-redis',
-          description: 'MCPaaS Redis Cache'
+          name: 'app-redis',
+          description: 'Redis Cache'
         });
         services.push(redis.uuid);
       }
@@ -402,8 +402,8 @@ export class CoolifyClient {
           type: 'minio',
           project_uuid: projectUuid,
           server_uuid: serverUuid,
-          name: 'mcpaas-minio',
-          description: 'MCPaaS Object Storage'
+          name: 'app-minio',
+          description: 'Object Storage'
         });
         services.push(minio.uuid);
       }
@@ -412,7 +412,7 @@ export class CoolifyClient {
         project_uuid: projectUuid,
         services,
         status: 'deployed',
-        message: 'MCPaaS stack deployed successfully'
+        message: 'Infrastructure stack deployed successfully'
       };
     } catch (error) {
       return {

@@ -470,20 +470,20 @@ export class CoolifyMcpServer extends McpServer {
       };
     });
 
-    // MCPaaS Specific Tools
-    this.tool('create_mcpaas_project', 'Create a new MCPaaS project with all required services', {
+    // Full-Stack Deployment Tools
+    this.tool('create_fullstack_project', 'Create a new project with common services (PostgreSQL, Redis, MinIO)', {
       name: z.string(),
       description: z.string().optional(),
       domain: z.string().optional(),
       server_uuid: z.string()
     }, async (args, _extra) => {
-      const result = await this.client.createMCPaaSProject(args);
+      const result = await this.client.createFullStackProject(args);
       return {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
       };
     });
 
-    this.tool('deploy_mcpaas_stack', 'Deploy the complete MCPaaS stack (PostgreSQL, Redis, MinIO)', {
+    this.tool('deploy_infrastructure_stack', 'Deploy common infrastructure services (PostgreSQL, Redis, MinIO)', {
       project_uuid: z.string(),
       server_uuid: z.string(),
       include_postgres: z.boolean().default(true),
@@ -499,7 +499,7 @@ export class CoolifyMcpServer extends McpServer {
         domain: args.domain,
         environment_variables: args.environment_variables
       };
-      const result = await this.client.deployMCPaaSStack(args.project_uuid, args.server_uuid, config);
+      const result = await this.client.deployInfrastructureStack(args.project_uuid, args.server_uuid, config);
       return {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
       };
