@@ -29,6 +29,11 @@ import {
   InfrastructureDeploymentConfig,
   InfrastructureDeploymentResponse,
 } from '../types/coolify.js';
+import { ErrorHandler, EnhancedError } from './error-handler.js';
+import { RetryManager } from './retry-manager.js';
+import debug from 'debug';
+
+const log = debug('coolify:client');
 
 export class CoolifyClient {
   private baseUrl: string;
@@ -46,32 +51,48 @@ export class CoolifyClient {
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    try {
-      const url = `${this.baseUrl}/api/v1${path}`;
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        ...options,
-      });
+    return RetryManager.executeWithRetry(
+      async () => {
+        try {
+          const url = `${this.baseUrl}/api/v1${path}`;
+          log(`Making request to: ${url}`);
+          
+          const response = await fetch(url, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+            ...options,
+          });
 
-      const data = await response.json();
+          let data: any;
+          try {
+            data = await response.json();
+          } catch (jsonError) {
+            // Handle non-JSON responses
+            const text = await response.text();
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${text || response.statusText}`);
+            }
+            return text as T;
+          }
 
-      if (!response.ok) {
-        const error = data as ErrorResponse;
-        throw new Error(error.message || `HTTP ${response.status}: ${response.statusText}`);
-      }
+          if (!response.ok) {
+            const error = data as ErrorResponse;
+            const errorMessage = error.message || `HTTP ${response.status}: ${response.statusText}`;
+            log(`API error: ${response.status} - ${errorMessage}`);
+            throw new Error(errorMessage);
+          }
 
-      return data as T;
-    } catch (error) {
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error(
-          `Failed to connect to Coolify server at ${this.baseUrl}. Please check if the server is running and the URL is correct.`,
-        );
-      }
-      throw error;
-    }
+          log(`Request successful: ${path}`);
+          return data as T;
+        } catch (error) {
+          log(`Request failed: ${path} - ${error}`);
+          throw error;
+        }
+      },
+      RetryManager.createRetryOptions('api')
+    );
   }
 
   async listServers(): Promise<ServerInfo[]> {

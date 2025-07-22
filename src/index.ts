@@ -2,6 +2,7 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CoolifyMcpServer } from './lib/mcp-server.js';
+import { EnhancedCoolifyMcpServer } from './lib/enhanced-mcp-server.js';
 import { CoolifyConfig } from './types/coolify.js';
 
 declare const process: NodeJS.Process;
@@ -16,9 +17,15 @@ async function main(): Promise<void> {
     throw new Error('COOLIFY_ACCESS_TOKEN environment variable is required');
   }
 
-  const server = new CoolifyMcpServer(config);
+  // Use enhanced server if ENHANCED flag is set, otherwise use original
+  const useEnhanced = process.env.COOLIFY_MCP_ENHANCED === 'true';
+  const server = useEnhanced 
+    ? new EnhancedCoolifyMcpServer(config)
+    : new CoolifyMcpServer(config);
+
   const transport = new StdioServerTransport();
 
+  console.error(`Starting ${useEnhanced ? 'Enhanced' : 'Standard'} Coolify MCP Server...`);
   await server.connect(transport);
 }
 
