@@ -5,6 +5,7 @@ import { ErrorHandler, EnhancedError } from './error-handler.js';
 import { ParameterValidator } from './parameter-validator.js';
 import { EnvironmentManager } from './environment-manager.js';
 import debug from 'debug';
+import { sanitizeForMcp } from './sanitize.js';
 import { z } from 'zod';
 import type {
   ServerInfo,
@@ -84,8 +85,8 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             content: [{ 
               type: 'text', 
               text: JSON.stringify({
-                success: true,
-                data: servers,
+              success: true,
+              data: sanitizeForMcp(servers),
                 count: servers.length,
                 message: `Successfully retrieved ${servers.length} servers`
               }, null, 2) 
@@ -105,7 +106,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: server,
+              data: sanitizeForMcp(server),
               message: `Successfully retrieved server: ${server.name}`
             }, null, 2) 
           }]
@@ -128,7 +129,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: result,
+              data: sanitizeForMcp(result),
               message: `Successfully created project: ${validatedArgs.name}`,
               next_steps: [
                 'You can now create services in this project',
@@ -238,7 +239,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: result,
+              data: sanitizeForMcp(result),
               message: `Successfully created ${validatedArgs.type} service`,
               configuration: {
                 service_type: validatedArgs.type,
@@ -299,7 +300,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: result,
+              data: sanitizeForMcp(result),
               message: `Successfully created application: ${validatedArgs.name}`,
               configuration: {
                 build_pack: applicationRequest.build_pack,
@@ -387,7 +388,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: projects,
+              data: sanitizeForMcp(projects),
               count: projects.length
             }, null, 2) 
           }]
@@ -403,7 +404,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: applications,
+              data: sanitizeForMcp(applications),
               count: applications.length
             }, null, 2) 
           }]
@@ -419,7 +420,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: services,
+              data: sanitizeForMcp(services),
               count: services.length
             }, null, 2) 
           }]
@@ -438,7 +439,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: project,
+              data: sanitizeForMcp(project),
               message: `Successfully retrieved project: ${project.name}`
             }, null, 2) 
           }]
@@ -456,7 +457,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: result,
+              data: sanitizeForMcp(result),
               message: `Successfully deleted project`
             }, null, 2) 
           }]
@@ -475,7 +476,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: service,
+              data: sanitizeForMcp(service),
               message: `Successfully retrieved service: ${service.name}`
             }, null, 2) 
           }]
@@ -494,7 +495,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: application,
+              data: sanitizeForMcp(application),
               message: `Successfully retrieved application: ${application.name}`
             }, null, 2) 
           }]
@@ -513,7 +514,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: resources,
+              data: sanitizeForMcp(resources),
               count: resources.length,
               message: `Successfully retrieved ${resources.length} server resources`
             }, null, 2) 
@@ -532,7 +533,7 @@ export class EnhancedCoolifyMcpServer extends McpServer {
             type: 'text', 
             text: JSON.stringify({
               success: true,
-              data: domains,
+              data: sanitizeForMcp(domains),
               count: domains.length,
               message: `Successfully retrieved domain configurations`
             }, null, 2) 

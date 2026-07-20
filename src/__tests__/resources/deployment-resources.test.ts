@@ -20,25 +20,21 @@ describe('DeploymentResources', () => {
   beforeEach(() => {
     mockClient = {
       deployApplication: jest.fn(),
+      getDeployment: jest.fn(),
     } as unknown as jest.Mocked<CoolifyClient>;
     resources = new DeploymentResources(mockClient);
   });
 
-  describe('listDeployments', () => {
-    it('should throw not implemented error', async () => {
-      await expect(resources.listDeployments()).rejects.toThrow('Not implemented');
-    });
-  });
-
   describe('getDeployment', () => {
-    it('should throw not implemented error', async () => {
-      await expect(resources.getDeployment('test-id')).rejects.toThrow('Not implemented');
+    it('delegates to client.getDeployment', async () => {
+      mockClient.getDeployment.mockResolvedValue(mockDeployment as never);
+      await expect(resources.getDeployment('test-id')).resolves.toEqual(mockDeployment);
     });
   });
 
   describe('deploy', () => {
     it('should deploy an application', async () => {
-      mockClient.deployApplication.mockResolvedValue(mockDeployment);
+      mockClient.deployApplication.mockResolvedValue(mockDeployment as never);
 
       const result = await resources.deploy({ uuid: 'test-uuid' });
 

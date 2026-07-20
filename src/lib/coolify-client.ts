@@ -337,8 +337,18 @@ export class CoolifyClient {
   }
 
   // Deployment Management
-  async getDeployments(applicationUuid: string): Promise<Deployment[]> {
-    return this.request<Deployment[]>(`/applications/${applicationUuid}/deployments`);
+  async getDeployments(applicationUuid: string, take = 20): Promise<Deployment[]> {
+    // Coolify v4: GET /api/v1/deployments/applications/{uuid} — not /applications/{uuid}/deployments
+    const data = await this.request<Deployment[] | { deployments?: Deployment[]; count?: number }>(
+      `/deployments/applications/${applicationUuid}?take=${take}`
+    );
+    if (Array.isArray(data)) {
+      return data;
+    }
+    if (data && Array.isArray(data.deployments)) {
+      return data.deployments;
+    }
+    return [];
   }
 
   async getDeployment(uuid: string): Promise<Deployment> {

@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import { CoolifyClient } from './coolify-client.js';
 import debug from 'debug';
+import { jsonToolContent } from './sanitize.js';
 import { z } from 'zod';
 import type {
   ServerInfo,
@@ -134,61 +135,47 @@ export class CoolifyMcpServer extends McpServer {
     // Then register all tools
     this.tool('list_servers', 'List all Coolify servers', {}, async () => {
       const servers = await this.client.listServers();
-      return {
-        content: [{ type: 'text', text: JSON.stringify(servers, null, 2) }]
-      };
+      return jsonToolContent(servers);
     });
 
     this.tool('get_server', 'Get details about a specific Coolify server', {
       uuid: z.string().describe('UUID of the server to get details for')
     }, async (args) => {
       const server = await this.client.getServer(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(server, null, 2) }]
-      };
+      return jsonToolContent(server, { mode: 'detail' });
     });
 
     this.tool('get_server_resources', 'Get the current resources running on a specific Coolify server', {
       uuid: z.string()
     }, async (args, _extra) => {
       const resources = await this.client.getServerResources(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(resources, null, 2) }]
-      };
+      return jsonToolContent(resources);
     });
 
     this.tool('get_server_domains', 'Get domains for a specific Coolify server', {
       uuid: z.string()
     }, async (args, _extra) => {
       const domains = await this.client.getServerDomains(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(domains, null, 2) }]
-      };
+      return jsonToolContent(domains);
     });
 
     this.tool('validate_server', 'Validate a specific Coolify server', {
       uuid: z.string()
     }, async (args, _extra) => {
       const validation = await this.client.validateServer(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(validation, null, 2) }]
-      };
+      return jsonToolContent(validation, { mode: 'detail' });
     });
 
     this.tool('list_projects', 'List all Coolify projects', {}, async (_args, _extra) => {
       const projects = await this.client.listProjects();
-      return {
-        content: [{ type: 'text', text: JSON.stringify(projects, null, 2) }]
-      };
+      return jsonToolContent(projects);
     });
 
     this.tool('get_project', 'Get details about a specific Coolify project', {
       uuid: z.string()
     }, async (args, _extra) => {
       const project = await this.client.getProject(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(project, null, 2) }]
-      };
+      return jsonToolContent(project, { mode: 'detail' });
     });
 
     this.tool('create_project', 'Create a new Coolify project', {
@@ -199,9 +186,7 @@ export class CoolifyMcpServer extends McpServer {
         name: args.name,
         description: args.description
       });
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('update_project', 'Update an existing Coolify project', {
@@ -211,18 +196,14 @@ export class CoolifyMcpServer extends McpServer {
     }, async (args, _extra) => {
       const { uuid, ...updateData } = args;
       const result = await this.client.updateProject(uuid, updateData);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('delete_project', 'Delete a Coolify project', {
       uuid: z.string()
     }, async (args, _extra) => {
       const result = await this.client.deleteProject(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('get_project_environment', 'Get environment details for a Coolify project', {
@@ -230,25 +211,19 @@ export class CoolifyMcpServer extends McpServer {
       environment_name_or_uuid: z.string()
     }, async (args, _extra) => {
       const environment = await this.client.getProjectEnvironment(args.project_uuid, args.environment_name_or_uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(environment, null, 2) }]
-      };
+      return jsonToolContent(environment, { mode: 'detail' });
     });
 
     this.tool('list_databases', 'List all Coolify databases', {}, async (_args, _extra) => {
       const databases = await this.client.listDatabases();
-      return {
-        content: [{ type: 'text', text: JSON.stringify(databases, null, 2) }]
-      };
+      return jsonToolContent(databases);
     });
 
     this.tool('get_database', 'Get details about a specific Coolify database', {
       uuid: z.string()
     }, async (args, _extra) => {
       const database = await this.client.getDatabase(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(database, null, 2) }]
-      };
+      return jsonToolContent(database, { mode: 'detail' });
     });
 
     this.tool('update_database', 'Update a Coolify database', {
@@ -256,9 +231,7 @@ export class CoolifyMcpServer extends McpServer {
       data: z.record(z.unknown())
     }, async (args, _extra) => {
       const result = await this.client.updateDatabase(args.uuid, args.data);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     const deleteOptionsSchema = {
@@ -273,34 +246,30 @@ export class CoolifyMcpServer extends McpServer {
       options: z.object(deleteOptionsSchema).optional()
     }, async (args, _extra) => {
       const result = await this.client.deleteDatabase(args.uuid, args.options);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('deploy_application', 'Deploy a Coolify application', {
       uuid: z.string()
     }, async (args, _extra) => {
       const result = await this.client.deployApplication(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('list_services', 'List all Coolify services', {}, async (_args, _extra) => {
       const services = await this.client.listServices();
-      return {
-        content: [{ type: 'text', text: JSON.stringify(services, null, 2) }]
-      };
+      return jsonToolContent(services);
     });
 
-    this.tool('get_service', 'Get details about a specific Coolify service', {
-      uuid: z.string()
+    this.tool('get_service', 'Get details about a specific Coolify service (compose bodies redacted by default)', {
+      uuid: z.string(),
+      reveal_secrets: z.boolean().optional().describe('If true, include compose/env secret material. Default false.')
     }, async (args, _extra) => {
       const service = await this.client.getService(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(service, null, 2) }]
-      };
+      return jsonToolContent(service, {
+        mode: 'detail',
+        revealSecrets: Boolean(args.reveal_secrets),
+      });
     });
 
     this.tool('create_service', 'Create a new Coolify service', {
@@ -315,9 +284,7 @@ export class CoolifyMcpServer extends McpServer {
       instant_deploy: z.boolean().optional()
     }, async (args, _extra) => {
       const result = await this.client.createService(args);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('delete_service', 'Delete a Coolify service', {
@@ -325,26 +292,24 @@ export class CoolifyMcpServer extends McpServer {
       options: z.object(deleteOptionsSchema).optional()
     }, async (args, _extra) => {
       const result = await this.client.deleteService(args.uuid, args.options);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     // Application Management Tools
     this.tool('list_applications', 'List all Coolify applications', {}, async (_args, _extra) => {
       const applications = await this.client.listApplications();
-      return {
-        content: [{ type: 'text', text: JSON.stringify(applications, null, 2) }]
-      };
+      return jsonToolContent(applications);
     });
 
-    this.tool('get_application', 'Get details about a specific Coolify application', {
-      uuid: z.string()
+    this.tool('get_application', 'Get details about a specific Coolify application (secret fields redacted by default)', {
+      uuid: z.string(),
+      reveal_secrets: z.boolean().optional().describe('If true, include webhook secrets and similar fields. Default false.')
     }, async (args, _extra) => {
       const application = await this.client.getApplication(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(application, null, 2) }]
-      };
+      return jsonToolContent(application, {
+        mode: 'detail',
+        revealSecrets: Boolean(args.reveal_secrets),
+      });
     });
 
     this.tool('create_application', 'Create a new Coolify application', {
@@ -361,9 +326,7 @@ export class CoolifyMcpServer extends McpServer {
       environment_name: z.string().optional()
     }, async (args, _extra) => {
       const result = await this.client.createApplication(args);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('delete_application', 'Delete a Coolify application', {
@@ -371,19 +334,19 @@ export class CoolifyMcpServer extends McpServer {
       options: z.object(deleteOptionsSchema).optional()
     }, async (args, _extra) => {
       const result = await this.client.deleteApplication(args.uuid, args.options);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     // Environment Variable Management
-    this.tool('get_application_environment_variables', 'Get environment variables for an application', {
-      uuid: z.string()
+    this.tool('get_application_environment_variables', 'Get environment variables for an application (values redacted by default)', {
+      uuid: z.string(),
+      reveal_secrets: z.boolean().optional().describe('If true, return plaintext values. Default false. Blocked when COOLIFY_MCP_FORBID_SECRETS=true.')
     }, async (args, _extra) => {
       const variables = await this.client.getApplicationEnvironmentVariables(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(variables, null, 2) }]
-      };
+      return jsonToolContent(variables, {
+        mode: 'detail',
+        revealSecrets: Boolean(args.reveal_secrets),
+      });
     });
 
     this.tool('update_application_environment_variables', 'Update environment variables for an application', {
@@ -397,9 +360,7 @@ export class CoolifyMcpServer extends McpServer {
       }))
     }, async (args, _extra) => {
       const result = await this.client.updateApplicationEnvironmentVariables(args.uuid, args.variables);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     // Docker Compose Service Management
@@ -414,9 +375,7 @@ export class CoolifyMcpServer extends McpServer {
       instant_deploy: z.boolean().optional()
     }, async (args, _extra) => {
       const result = await this.client.createDockerComposeService(args);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     // Deployment Management
@@ -424,27 +383,21 @@ export class CoolifyMcpServer extends McpServer {
       application_uuid: z.string()
     }, async (args, _extra) => {
       const deployments = await this.client.getDeployments(args.application_uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(deployments, null, 2) }]
-      };
+      return jsonToolContent(deployments);
     });
 
     this.tool('get_deployment', 'Get details about a specific deployment', {
       uuid: z.string()
     }, async (args, _extra) => {
       const deployment = await this.client.getDeployment(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(deployment, null, 2) }]
-      };
+      return jsonToolContent(deployment, { mode: 'detail' });
     });
 
     this.tool('cancel_deployment', 'Cancel a running deployment', {
       uuid: z.string()
     }, async (args, _extra) => {
       const result = await this.client.cancelDeployment(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     // Application Resources and Logs
@@ -452,9 +405,7 @@ export class CoolifyMcpServer extends McpServer {
       uuid: z.string()
     }, async (args, _extra) => {
       const resources = await this.client.getApplicationResources(args.uuid);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(resources, null, 2) }]
-      };
+      return jsonToolContent(resources);
     });
 
     this.tool('get_application_logs', 'Get logs for an application', {
@@ -465,9 +416,7 @@ export class CoolifyMcpServer extends McpServer {
     }, async (args, _extra) => {
       const { uuid, ...options } = args;
       const logs = await this.client.getApplicationLogs(uuid, options);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(logs, null, 2) }]
-      };
+      return jsonToolContent(logs, { mode: 'detail' });
     });
 
     // Full-Stack Deployment Tools
@@ -478,9 +427,7 @@ export class CoolifyMcpServer extends McpServer {
       server_uuid: z.string()
     }, async (args, _extra) => {
       const result = await this.client.createFullStackProject(args);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
 
     this.tool('deploy_infrastructure_stack', 'Deploy common infrastructure services (PostgreSQL, Redis, MinIO)', {
@@ -500,9 +447,7 @@ export class CoolifyMcpServer extends McpServer {
         environment_variables: args.environment_variables
       };
       const result = await this.client.deployInfrastructureStack(args.project_uuid, args.server_uuid, config);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
+      return jsonToolContent(result, { mode: 'detail' });
     });
   }
 
