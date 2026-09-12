@@ -9,16 +9,9 @@ export class DeploymentResources {
     this.client = client;
   }
 
-  @Resource('coolify/deployments/list')
-  async listDeployments(): Promise<Deployment[]> {
-    // TODO: Implement listDeployments in CoolifyClient
-    throw new Error('Not implemented');
-  }
-
   @Resource('coolify/deployments/{id}')
-  async getDeployment(_id: string): Promise<Deployment> {
-    // TODO: Implement getDeployment in CoolifyClient
-    throw new Error('Not implemented');
+  async getDeployment(id: string): Promise<Deployment> {
+    return this.client.getDeployment(id);
   }
 
   @Resource('coolify/deploy')

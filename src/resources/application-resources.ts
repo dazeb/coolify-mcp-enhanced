@@ -1,5 +1,5 @@
-import { Resource } from '../lib/resource.js';
 import { CoolifyClient } from '../lib/coolify-client.js';
+import { Resource } from '../lib/resource.js';
 import { Application, CreateApplicationRequest } from '../types/coolify.js';
 
 export class ApplicationResources {
@@ -11,25 +11,21 @@ export class ApplicationResources {
 
   @Resource('coolify/applications/list')
   async listApplications(): Promise<Application[]> {
-    // TODO: Implement listApplications in CoolifyClient
-    throw new Error('Not implemented');
+    return this.client.listApplications();
   }
 
   @Resource('coolify/applications/{id}')
-  async getApplication(_id: string): Promise<Application> {
-    // TODO: Implement getApplication in CoolifyClient
-    throw new Error('Not implemented');
+  async getApplication(id: string): Promise<Application> {
+    return this.client.getApplication(id);
   }
 
   @Resource('coolify/applications/create')
-  async createApplication(_data: CreateApplicationRequest): Promise<{ uuid: string }> {
-    // TODO: Implement createApplication in CoolifyClient
-    throw new Error('Not implemented');
+  async createApplication(data: CreateApplicationRequest): Promise<{ uuid: string }> {
+    return this.client.createApplication(data);
   }
 
   @Resource('coolify/applications/{id}/delete')
-  async deleteApplication(_id: string): Promise<{ message: string }> {
-    // TODO: Implement deleteApplication in CoolifyClient
-    throw new Error('Not implemented');
+  async deleteApplication(id: string): Promise<{ message: string }> {
+    return this.client.deleteApplication(id);
   }
 }
